@@ -45,6 +45,18 @@ namespace CookieAuthentication
                     .Requirements.Add(new ProbationPassedRequirement(2)));
                 });
             services.AddSingleton<IAuthorizationHandler, ProbationPassedRequirmentHandler>();
+
+            // Configure New Http Client 
+            services.AddHttpClient("BookApiHttpClient", configureClient =>
+            {
+                configureClient.BaseAddress = new Uri("https://localhost:44357/");
+            });
+
+            // Configure New Http Client 
+            services.AddHttpClient("WeatherApiHttpClient", configureClient =>
+            {
+                configureClient.BaseAddress = new Uri("https://localhost:44331/");
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -1,22 +1,31 @@
-﻿using CookieAuthentication.Models;
+﻿using CookieAuthentication.DTO;
+using CookieAuthentication.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.AspNetCore.Http.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Json;
 using System.Threading.Tasks;
+using System.Net;
 
 namespace CookieAuthentication.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly IHttpClientFactory _httpClientFactory;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, IHttpClientFactory httpClientFactory)
         {
             _logger = logger;
+            _httpClientFactory = httpClientFactory;
         }
 
         [HttpGet("")]
@@ -40,10 +49,13 @@ namespace CookieAuthentication.Controllers
 
         [HttpGet("hr-dashboard")]
         [Authorize(Policy = "RequireBelongsToHrDeptAdmins")]
-        public IActionResult HrDashboard()
-        {
-            return View();
+        public async Task<IActionResult> HrDashboard()
+        {       
+            var httpClient = _httpClientFactory.CreateClient("BookApiHttpClient");
+            var books = await httpClient.GetFromJsonAsync<List<BookDTO>>("book/all-books");
+            return View(books);
         }
+
         [HttpGet("hr-regular")]
         [Authorize(Policy = "RequireBelongsToHrDept")]
         public IActionResult HrRegular()
