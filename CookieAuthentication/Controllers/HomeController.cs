@@ -14,6 +14,8 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 using System.Net;
+using Newtonsoft.Json;
+using System.Net.Http.Headers;
 
 namespace CookieAuthentication.Controllers
 {
@@ -35,6 +37,41 @@ namespace CookieAuthentication.Controllers
         {
             return View();
         }
+   
+
+        [HttpGet("hr-dashboard")]
+        //[Authorize(Policy = "RequireBelongsToHrDeptAdmins")]
+        public async Task<IActionResult> HrDashboard()
+        {
+
+            var httpClient = _httpClientFactory.CreateClient("WeatherForecastApiHttpClient");
+            var strJwt = HttpContext.Session.GetString("weather_jwt");
+            //if(string.IsNullOrWhiteSpace(strJwt))
+
+            var jwt = JsonConvert.DeserializeObject<TokenModel>(HttpContext.Session.GetString("weather_jwt"));
+            if (jwt == null ||
+                string.IsNullOrWhiteSpace(jwt.AccessToken) ||
+                DateTime.UtcNow > jwt.ExpiresAt)
+            {
+                var respnse = await httpClient.PostAsJsonAsync("Authenticate",
+                   new WeatherApiCredentialModel() { Password = "password", UserName = "admin" });
+                respnse.EnsureSuccessStatusCode();
+                jwt = JsonConvert.DeserializeObject<TokenModel>(await respnse.Content.ReadAsStringAsync());
+
+            }
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt.AccessToken);
+            var WeatherForecasts = await httpClient.GetFromJsonAsync<List<WeatherDTO>>("GetWeatherForecasts");
+            return View(WeatherForecasts);
+        }
+
+        [HttpGet("hr-regular")]
+        [Authorize(Policy = "RequireBelongsToHrDept")]
+        public IActionResult HrRegular()
+        {
+            return View();
+        }
+
+
         [HttpGet("privacy")]
         public IActionResult Privacy()
         {
@@ -46,22 +83,5 @@ namespace CookieAuthentication.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
-
-        [HttpGet("hr-dashboard")]
-        [Authorize(Policy = "RequireBelongsToHrDeptAdmins")]
-        public async Task<IActionResult> HrDashboard()
-        {       
-            var httpClient = _httpClientFactory.CreateClient("BookApiHttpClient");
-            var books = await httpClient.GetFromJsonAsync<List<BookDTO>>("book/all-books");
-            return View(books);
-        }
-
-        [HttpGet("hr-regular")]
-        [Authorize(Policy = "RequireBelongsToHrDept")]
-        public IActionResult HrRegular()
-        {
-            return View();
-        }
-
     }
 }

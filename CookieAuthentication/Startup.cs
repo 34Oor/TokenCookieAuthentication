@@ -53,9 +53,16 @@ namespace CookieAuthentication
             });
 
             // Configure New Http Client 
-            services.AddHttpClient("WeatherApiHttpClient", configureClient =>
+            services.AddHttpClient("WeatherForecastApiHttpClient", configureClient =>
             {
                 configureClient.BaseAddress = new Uri("https://localhost:44331/");
+            });
+
+            services.AddSession(options =>
+            {
+                options.Cookie.IsEssential = true;
+                options.Cookie.HttpOnly = true;
+                options.IdleTimeout = TimeSpan.FromHours(8);
             });
         }
 
@@ -76,8 +83,11 @@ namespace CookieAuthentication
             app.UseStaticFiles();
 
             app.UseRouting();
+
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.UseSession();
 
             app.UseEndpoints(endpoints =>
             {

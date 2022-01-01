@@ -4,25 +4,29 @@
 @{
     ViewData["Title"] = "HR Dashboard";
 }
-@model IEnumerable<CookieAuthentication.DTO.BookDTO>
+@model IEnumerable<CookieAuthentication.DTO.WeatherDTO>
 
-<h1>HR Dashboard</h1>
+
+<h1 class="">HR Dashboard</h1>
+<hr />
 
 <table class="table table-bordered table-striped">
     <thead>
         <tr>
-            <td>Title</td>
-            <td>Description</td>
-            <td>Rate</td>
+            <td >Date</td>
+            <td>TemperatureC</td>
+            <td>TemperatureF</td>
+            <td>Summary</td>
         </tr>
     </thead>
     <tbody>
         @foreach(var item in Model.ToList())
         {
             <tr>
-                <td>@item.Title</td>
-                <td>@item.Description</td>
-                <td>@item.Rate</td>
+                <td>@item.Date</td>
+                <td>@item.TemperatureC</td>
+                <td>@item.TemperatureF</td>
+                <td>@item.Summary</td>
             </tr>
         }
         
