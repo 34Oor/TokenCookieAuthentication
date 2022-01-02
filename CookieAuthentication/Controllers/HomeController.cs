@@ -4,14 +4,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net.Http;
-using System.Net.Http.Json;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
-using System.Net.Http.Headers;
 using CookieAuthentication.Services;
 using Microsoft.Extensions.Configuration;
 
