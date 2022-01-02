@@ -3,7 +3,7 @@ using System;
 
 namespace CookieAuthentication.DTO
 {
-    public class TokenModel
+    public class JwtModel
     {
         [JsonProperty("access_token")]
         public string AccessToken { get; set; }

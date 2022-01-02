@@ -1,4 +1,5 @@
 using CookieAuthentication.Authorization;
+using CookieAuthentication.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -47,13 +48,13 @@ namespace CookieAuthentication
             services.AddSingleton<IAuthorizationHandler, ProbationPassedRequirmentHandler>();
 
             // Configure New Http Client 
-            services.AddHttpClient("BookApiHttpClient", configureClient =>
+            services.AddHttpClient(Configuration.GetValue<string>("BookApiHttpClientName"), configureClient =>
             {
                 configureClient.BaseAddress = new Uri("https://localhost:44357/");
             });
 
             // Configure New Http Client 
-            services.AddHttpClient("WeatherForecastApiHttpClient", configureClient =>
+            services.AddHttpClient(Configuration.GetValue<string>("WeatherForecastApiHttpClientName"), configureClient =>
             {
                 configureClient.BaseAddress = new Uri("https://localhost:44331/");
             });
@@ -64,6 +65,8 @@ namespace CookieAuthentication
                 options.Cookie.HttpOnly = true;
                 options.IdleTimeout = TimeSpan.FromHours(8);
             });
+
+            services.AddTransient<ApiService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

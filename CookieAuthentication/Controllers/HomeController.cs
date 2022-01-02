@@ -4,18 +4,16 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Extensions;
-using Microsoft.AspNetCore.Http.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
-using System.Net;
 using Newtonsoft.Json;
 using System.Net.Http.Headers;
+using CookieAuthentication.Services;
+using Microsoft.Extensions.Configuration;
 
 namespace CookieAuthentication.Controllers
 {
@@ -23,11 +21,18 @@ namespace CookieAuthentication.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IConfiguration _configuration;
+        private readonly ApiService _apiService;
 
-        public HomeController(ILogger<HomeController> logger, IHttpClientFactory httpClientFactory)
+        public HomeController(ILogger<HomeController> logger,
+            IHttpClientFactory httpClientFactory,
+            IConfiguration configuration,
+            ApiService apiService)
         {
             _logger = logger;
             _httpClientFactory = httpClientFactory;
+            _configuration = configuration;
+            _apiService = apiService;
         }
 
         [HttpGet("")]
@@ -43,24 +48,13 @@ namespace CookieAuthentication.Controllers
         //[Authorize(Policy = "RequireBelongsToHrDeptAdmins")]
         public async Task<IActionResult> HrDashboard()
         {
+            var WeatherForecasts = await _apiService.InvokeEndPointAsync<IEnumerable<WeatherDTO>>(
+                clientName: _configuration.GetValue<string>("WeatherForecastApiHttpClientName"),
+                Uri: "GetWeatherForecasts",
+                sessionJwtName: "weather_jwt",
+                jwtEndPointUri: "Authenticate",
+                new WeatherApiCredentialDTO() { Password = "password", UserName = "admin" });
 
-            var httpClient = _httpClientFactory.CreateClient("WeatherForecastApiHttpClient");
-            var strJwt = HttpContext.Session.GetString("weather_jwt");
-            //if(string.IsNullOrWhiteSpace(strJwt))
-
-            var jwt = JsonConvert.DeserializeObject<TokenModel>(HttpContext.Session.GetString("weather_jwt"));
-            if (jwt == null ||
-                string.IsNullOrWhiteSpace(jwt.AccessToken) ||
-                DateTime.UtcNow > jwt.ExpiresAt)
-            {
-                var respnse = await httpClient.PostAsJsonAsync("Authenticate",
-                   new WeatherApiCredentialModel() { Password = "password", UserName = "admin" });
-                respnse.EnsureSuccessStatusCode();
-                jwt = JsonConvert.DeserializeObject<TokenModel>(await respnse.Content.ReadAsStringAsync());
-
-            }
-            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt.AccessToken);
-            var WeatherForecasts = await httpClient.GetFromJsonAsync<List<WeatherDTO>>("GetWeatherForecasts");
             return View(WeatherForecasts);
         }
 

@@ -22,7 +22,7 @@ namespace WeatherAPI.Services
             _configuration = configuration;
         }
 
-        public TokenModel Authenticate (CredentialModel credential)
+        public JwtModel Authenticate (CredentialModel credential)
         {
             try
             {
@@ -48,7 +48,7 @@ namespace WeatherAPI.Services
                             algorithm: SecurityAlgorithms.HmacSha256Signature)
                     );
 
-                    return new TokenModel() { 
+                    return new JwtModel() { 
                         AccessToken = new JwtSecurityTokenHandler().WriteToken(jwt),
                         ExpiresAt = expiresAt
                     };

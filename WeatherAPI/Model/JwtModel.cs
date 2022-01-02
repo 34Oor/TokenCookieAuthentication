@@ -2,7 +2,7 @@
 
 namespace WeatherAPI.Model
 {
-    public class TokenModel
+    public class JwtModel
     {
         public string AccessToken { get; set; }
         public DateTime ExpiresAt { get; set; }

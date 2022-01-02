@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace CookieAuthentication.Models
-{
-    public class WeatherApiCredentialModel
+namespace CookieAuthentication.DTO 
+{ 
+    public class WeatherApiCredentialDTO
     {
         
         public string UserName { get; set; }
