@@ -25,7 +25,7 @@ namespace WeatherAPI.Controllers
         }
 
         [HttpGet("GetWeatherForecasts")]
-        [Authorize]
+        [Authorize("OnlyStakeholders")]
         public IEnumerable<WeatherForecast> Get()
         {
             var rng = new Random();

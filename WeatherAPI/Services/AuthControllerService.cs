@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -14,15 +14,15 @@ namespace WeatherAPI.Services
     public class AuthControllerService
     {
         private readonly IConfiguration _configuration;
-        private readonly ILogger _logger;
+        private readonly ILogger<AuthControllerService> _logger;
 
-        public AuthControllerService(IConfiguration configuration)
+        public AuthControllerService(IConfiguration configuration, ILogger<AuthControllerService> logger)
         {
-
             _configuration = configuration;
+            _logger = logger;
         }
 
-        public JwtModel Authenticate (CredentialModel credential)
+        public string Authenticate (CredentialModel credential)
         {
             try
             {
@@ -33,9 +33,10 @@ namespace WeatherAPI.Services
 
                         new Claim(ClaimTypes.Name, credential.UserName),
                         new Claim("password", credential.Password),
-                        new Claim(ClaimTypes.Role, "admin"),
+                        new Claim(ClaimTypes.Role, "NotAdmin"),
                         new Claim("department", "HR"),
-                        new Claim("EmploymentDate", "2021-10-12")
+                        new Claim("EmploymentDate", "2021-10-12"),
+                        //new Claim("stakeholder", "false")
                     };
                     var expiresAt = DateTime.UtcNow.AddMinutes(10);
 
@@ -48,11 +49,10 @@ namespace WeatherAPI.Services
                             algorithm: SecurityAlgorithms.HmacSha256Signature)
                     );
 
-                    return new JwtModel() { 
-                        AccessToken = new JwtSecurityTokenHandler().WriteToken(jwt),
-                        ExpiresAt = expiresAt
-                    };
-                       
+                    return JsonConvert.SerializeObject(new{
+                        access_token = new JwtSecurityTokenHandler().WriteToken(jwt),
+                        expires_at = expiresAt
+                    });
                 }
                 return null;
             }

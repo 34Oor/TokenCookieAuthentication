@@ -46,9 +46,9 @@ namespace CookieAuthentication.Controllers
         {
             var WeatherForecasts = await _apiService.InvokeEndPointAsync<IEnumerable<WeatherDTO>>(
                 clientName: _configuration.GetValue<string>("WeatherForecastApiHttpClientName"),
-                Uri: "GetWeatherForecasts",
+                Uri: "WeatherForecast/GetWeatherForecasts",
                 sessionJwtName: "weather_jwt",
-                jwtEndPointUri: "Authenticate",
+                jwtEndPointUri: "Auth/Authenticate",
                 new WeatherApiCredentialDTO() { Password = "password", UserName = "admin" });
 
             return View(WeatherForecasts);

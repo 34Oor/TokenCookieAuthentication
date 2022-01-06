@@ -10,6 +10,7 @@
 <h1 class="">HR Dashboard</h1>
 <hr />
 
+@if(@Model != null){
 <table class="table table-bordered table-striped">
     <thead>
         <tr>
@@ -20,7 +21,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach(var item in Model.ToList())
+        @foreach(var item in Model)
         {
             <tr>
                 <td>@item.Date</td>
@@ -31,6 +32,11 @@
         }
         
     </tbody>
-</table>
+    </table>
+}
+else
+{
+    <h1 class="display-6 m-auto text-center text-secondary fw-bold"> No Items to Display!</h1>
+}
 
 

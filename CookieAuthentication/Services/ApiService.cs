@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 
@@ -18,52 +19,56 @@ namespace CookieAuthentication.Services
         // this service assuming that the authentication provider is pinded together with resources.
         public ApiService(IHttpClientFactory httpClientFactory,
             IHttpContextAccessor httpContextAccessor,
-            ILogger logger)
+            ILogger<ApiService> logger
+            )
         {
             HttpClientFactory = httpClientFactory;
-            HttpContext = httpContextAccessor.HttpContext;
+            HttpContextAccessor = httpContextAccessor;
             Logger = logger;
         }
 
         private IHttpClientFactory HttpClientFactory { get; }
-        private HttpContext HttpContext { get; }
-        private ILogger Logger { get; }
+        private IHttpContextAccessor HttpContextAccessor { get; }
+        private ILogger<ApiService> Logger { get; }
 
         public async Task<T> InvokeEndPointAsync<T>(string clientName, string Uri, string sessionJwtName, string jwtEndPointUri, object apiCredential)
         {
             try
             {
-                JwtModel jwt = null;
-                var strJwt = HttpContext.Session.GetString(sessionJwtName);
-                // if no jwt in session, get one from auth provider. 
-                if (string.IsNullOrWhiteSpace(strJwt))
-                    jwt = await GetJwt(clientName, jwtEndPointUri, apiCredential);
-                // if we have jwt in session
-                else
-                {
-                    jwt = JsonConvert.DeserializeObject<JwtModel>(strJwt);
-                    // if the jwt in the session is not valid any more, get one from auth provider.
-                    if (jwt == null ||
-                        string.IsNullOrWhiteSpace(jwt.AccessToken) ||
-                        DateTime.UtcNow > jwt.ExpiresAt)
-                        jwt = await GetJwt(clientName, jwtEndPointUri, apiCredential);
-                }
+                
+                var strJwt = HttpContextAccessor.HttpContext.Session.GetString(sessionJwtName);
+                JwtModel jwt = ValidateSessionJwt(strJwt);
+                // if not valid session JWT, get one from auth provider. 
+                if (jwt == null)
+                    jwt = await GetJwt(clientName, jwtEndPointUri, apiCredential, sessionJwtName);
+
                 // if credential provided is not authenticated
                 if (jwt == null)
-                    return JsonConvert.DeserializeObject<T>("");
+                    return default;
 
                 var httpClient = HttpClientFactory.CreateClient(clientName);
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer",jwt.AccessToken);
                 return await httpClient.GetFromJsonAsync<T>(Uri);
             }catch(Exception ex)
             {
                 Logger.LogError(ex, ex.Message);
-                return JsonConvert.DeserializeObject<T>("");
+                return default;
             }
-           
         }
 
+        private static JwtModel ValidateSessionJwt(string strJwt)
+        {
+            if (string.IsNullOrWhiteSpace(strJwt))
+                return null;
 
-        public async Task<JwtModel> GetJwt(string clientName, string uri, object apiCredential)
+            var jwt = JsonConvert.DeserializeObject<JwtModel>(strJwt);
+            if (jwt == null ||
+                string.IsNullOrWhiteSpace(jwt.AccessToken) ||
+                DateTime.UtcNow > jwt.ExpiresAt)
+                return null;
+            return jwt;
+        }
+        private async Task<JwtModel> GetJwt(string clientName, string uri, object apiCredential, string sessionJwtName)
         {
             // this function get authentication jwt from the authentication provider
             try
@@ -75,6 +80,7 @@ namespace CookieAuthentication.Services
 
                 if (strJwt == null || string.IsNullOrWhiteSpace(strJwt))
                     return null;
+                HttpContextAccessor.HttpContext.Session.SetString(sessionJwtName, strJwt);
                 return JsonConvert.DeserializeObject<JwtModel>(strJwt);
             }catch (Exception ex)
             {
