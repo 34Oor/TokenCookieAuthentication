@@ -1,4 +1,5 @@
 ﻿using CookieAuthentication.Models;
+using CookieAuthentication.Validators;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -23,9 +24,23 @@ namespace CookieAuthentication.Controllers
         [HttpPost("login")]
         public IActionResult Login(LoginModel loginModel)
         {
+            if (loginModel == null)
+                return View();
+
             // check model state
             if (!ModelState.IsValid)
                 return View(loginModel);
+
+            // server side validation
+            var validationResult = new LoginModelValidator().Validate(loginModel);
+            if (!validationResult.IsValid)
+            {
+                foreach (var error in validationResult.Errors)
+                    ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+                ModelState.AddModelError(string.Empty, "Faild Login Attempt");
+                return View(loginModel);
+            }
+
             // verify user credential 
             if(loginModel.UserName == "admin" && loginModel.Password == "password")
             {
@@ -53,7 +68,7 @@ namespace CookieAuthentication.Controllers
                     return Redirect(loginModel.ReturnUrl);
                 return RedirectToAction("Index", "Home");
             }
-            ModelState.AddModelError("validation-summary", "faild login attempt");
+            ModelState.AddModelError(string.Empty, "Invalid Username or Password!");
             return View(loginModel);
 
         }
