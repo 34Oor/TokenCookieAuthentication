@@ -36,7 +36,7 @@ namespace WeatherAPI.Services
                         new Claim(ClaimTypes.Role, "NotAdmin"),
                         new Claim("department", "HR"),
                         new Claim("EmploymentDate", "2021-10-12"),
-                        //new Claim("stakeholder", "false")
+                        new Claim("stakeholder", "false")
                     };
                     var expiresAt = DateTime.UtcNow.AddMinutes(10);
 
