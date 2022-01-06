@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31919.166
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CookieAuthentication", "CookieAuthentication\CookieAuthentication.csproj", "{C031FD20-BE12-4B97-B4C0-761E5BD84307}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TokenCookieAuthentication", "CookieAuthentication\TokenCookieAuthentication.csproj", "{C031FD20-BE12-4B97-B4C0-761E5BD84307}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeatherAPI", "WeatherAPI\WeatherAPI.csproj", "{C52BD2ED-10FE-4DDA-A098-6DD2A7FCC3B1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WeatherAPI", "WeatherAPI\WeatherAPI.csproj", "{C52BD2ED-10FE-4DDA-A098-6DD2A7FCC3B1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
