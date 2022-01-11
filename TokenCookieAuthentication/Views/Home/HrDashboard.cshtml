@@ -1,0 +1,42 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewData["Title"] = "HR Dashboard";
+}
+@model IEnumerable<CookieAuthentication.DTO.WeatherDTO>
+
+
+<h1 class="">HR Dashboard</h1>
+<hr />
+
+@if(@Model != null){
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <td >Date</td>
+            <td>TemperatureC</td>
+            <td>TemperatureF</td>
+            <td>Summary</td>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var item in Model)
+        {
+            <tr>
+                <td>@item.Date</td>
+                <td>@item.TemperatureC</td>
+                <td>@item.TemperatureF</td>
+                <td>@item.Summary</td>
+            </tr>
+        }
+        
+    </tbody>
+    </table>
+}
+else
+{
+    <h1 class="display-6 m-auto text-center text-secondary fw-bold"> No Items to Display!</h1>
+}
+
+
