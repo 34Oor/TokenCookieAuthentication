@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Net.Mail;
 using System.Threading.Tasks;
 
 namespace CookieAuthentication.Services
@@ -18,7 +19,7 @@ namespace CookieAuthentication.Services
         // this service assuming that the authentication provider is pinded together with resources.
         public ApiService(IHttpClientFactory httpClientFactory,
             IHttpContextAccessor httpContextAccessor,
-            ILogger logger)
+            ILogger<ApiService> logger)
         {
             HttpClientFactory = httpClientFactory;
             HttpContext = httpContextAccessor.HttpContext;
@@ -27,7 +28,7 @@ namespace CookieAuthentication.Services
 
         private IHttpClientFactory HttpClientFactory { get; }
         private HttpContext HttpContext { get; }
-        private ILogger Logger { get; }
+        private ILogger<ApiService> Logger { get; }
 
         public async Task<T> InvokeEndPointAsync<T>(string clientName, string Uri, string sessionJwtName, string jwtEndPointUri, object apiCredential)
         {
