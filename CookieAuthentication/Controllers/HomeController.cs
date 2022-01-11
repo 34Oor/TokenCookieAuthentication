@@ -67,18 +67,19 @@ namespace CookieAuthentication.Controllers
         [HttpGet("privacy")]
         public IActionResult Privacy()
         {
-            
-            var smtpClient = new SmtpClient("smtp.gmail.com", 587) { 
-                Credentials = new NetworkCredential("a.ashour.dev@gmail.com", "Ahmed&&Ashour01156923737"),
-                DeliveryMethod = SmtpDeliveryMethod.Network
-            };
-            smtpClient.Send(
-                new MailMessage(from: "a.ashour.dev@gmail.com", to: "ahmedashor461@gmail.com")
-                {
-                    Subject = "Test",
-                    Body = $"PathBase: { base.HttpContext.Request.PathBase} \n Path: { base.HttpContext.Request.Path} \n Host: { base.HttpContext.Request.Host}"
-           
-                });
+
+            //using (var smtpClient = new SmtpClient("smtp.gmail.com", 587))
+            //{
+            //    smtpClient.Credentials = new NetworkCredential("a.ashour.dev@gmail.com", "Ahmed&&Ashour01156923737");
+            //    smtpClient.EnableSsl = true;
+
+            //    smtpClient.Send(
+            //        new MailMessage(from: "a.ashour.dev@gmail.com", to: "ahmedashor461@gmail.com")
+            //        {
+            //            Subject = "Test",
+            //            Body = $"PathBase: { base.HttpContext.Request.PathBase} \n Path: { base.HttpContext.Request.Path} \n Host: { base.HttpContext.Request.Host}",
+            //        });
+            //}
             return View();
         }
         [HttpGet("error")]
